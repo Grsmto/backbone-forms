@@ -96,16 +96,31 @@
         value: value,
         Editor: this.Editor,
         key: this.key
-      }).render();
+      });
+
+      // When new item is being added, trigger 'add' event
+      item.on('open', function() {
+        this.trigger('add', item, item.editor);
+      }, this);
+
+      item.on('close', function() {
+        this.trigger('close', item, item.editor);
+      }, this);
+
+      item.render();
       
       var _addItem = function() {
         self.items.push(item);
         self.$list.append(item.el);
-        
+
+        // Remove pending listeners
+        item.editor.off('open close');
+        item.off('open close');
+
         item.editor.on('all', function(event) {
           if (event === 'change') return;
-
           // args = ["key:change", itemEditor, fieldEditor]
+
           var args = _.toArray(arguments);
           args[0] = 'item:' + event;
           args.splice(1, 0, self);
@@ -156,7 +171,7 @@
         _addItem();
         item.editor.focus();
       }
-      
+
       return item;
     },
 
@@ -304,7 +319,17 @@
         list: this.list,
         item: this,
         form: this.form
-      }).render();
+      });
+
+      this.editor.on('open', function() {
+        this.trigger('open', this, this.editor);
+      }, this);
+
+      this.editor.on('close', function() {
+        this.trigger('close', this, this.editor);
+      }, this);
+
+      this.editor.render();
 
       //Create main element
       var $el = $($.trim(this.template()));
@@ -563,11 +588,11 @@
      * Cleans up references, triggers events. To be called whenever the modal closes
      */
     onModalClosed: function() {
-      this.modal = null;
-      this.modalForm = null;
-
       this.trigger('close', this);
       this.trigger('blur', this);
+      
+      this.modal = null;
+      this.modalForm = null;
     },
 
     getValue: function() {
