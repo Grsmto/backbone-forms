@@ -156,7 +156,7 @@
         }
         
         if (userInitiated) {
-          self.trigger('add', self, item.editor);
+          self.trigger('added', self, item.editor);
           self.trigger('change', self);
         }
       };
