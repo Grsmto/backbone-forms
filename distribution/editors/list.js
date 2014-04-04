@@ -548,10 +548,12 @@
         animate: true
       });
 
-      modal.open();
+      modal.$el.on('show.bs.modal', function() {
+        self.trigger('open', self);
+        self.trigger('focus', self);
+      });
 
-      this.trigger('open', this);
-      this.trigger('focus', this);
+      modal.open();
 
       modal.on('cancel', this.onModalClosed, this);
       
